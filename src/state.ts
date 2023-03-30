@@ -20,6 +20,7 @@ export const initState = <State>(initialState: State) => {
     };
 
   const subscribe = (sub: (state: State) => void): void => {
+    sub(state);
     subscribers.add(sub);
   };
 
