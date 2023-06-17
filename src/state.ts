@@ -1,6 +1,11 @@
 import { BrandString } from "./type-util";
 
-export type SongId = BrandString<'SongId'>
+export type State = {
+    status: PlayStatus;
+    sentCommands: MpdCommand[];
+    desiredCommands: MpdCommand[];
+    responseData: string;
+}
 
 export type Song = {
     file: SongId;
@@ -17,3 +22,9 @@ export type PlayStatus = {
     trackPosition: number;
     currentTrack: SongId
 }
+
+// This is not literally what get's sent on the websocket, just a representation of
+// something we need to tell the server.
+export type MpdCommand = {type: 'pause'} | {type: 'stop'} | {type: 'next_track'} | {type: 'previous_track'} | {type: 'set_volume', volume: number}
+
+export type SongId = BrandString<'SongId'>
