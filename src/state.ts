@@ -1,7 +1,7 @@
 import { BrandString } from "./type-util";
 
 export type State = {
-    status: PlayStatus;
+    player: PlayerStatus;
     sentIntents: UserIntent[];
     pendingIntents: UserIntent[];
     responseData: string;
@@ -16,7 +16,7 @@ export type Song = {
     duration?: number;
 }
 
-export type PlayStatus = {
+export type PlayerStatus = {
     state: 'pause' | 'stop' | 'play';
     volume: number;
     trackPosition: number;
