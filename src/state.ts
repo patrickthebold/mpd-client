@@ -1,10 +1,22 @@
 import { BrandString } from "./type-util";
 
-export type State = {
+export type State = ConnectedState | DisconnectedState | ConnectingState;
+
+export type ConnectedState = {
+    websocket: 'connected';
     player: PlayerStatus;
     sentIntents: UserIntent[];
     pendingIntents: UserIntent[];
     responseData: string;
+}
+
+export type DisconnectedState = {
+    websocket: 'disconnected';
+    pendingIntents: UserIntent[];
+}
+export type ConnectingState = {
+    websocket: 'connecting';
+    pendingIntents: UserIntent[];
 }
 
 export type Song = {
