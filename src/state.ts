@@ -1,6 +1,6 @@
 import { initState } from "./state-management";
-import { BrandString } from "./type-util";
-import { RecordOf, List, Record } from "immutable";
+import { type BrandString } from "./type-util";
+import { type RecordOf, List, Record } from "immutable";
 
 const makeDisconnectedState: Record.Factory<DisconnectedStateProps> = Record({
   websocket: "disconnected",

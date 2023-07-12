@@ -3,10 +3,10 @@
 // Once an initial state is given we can turn reducers into handlers.
 // We can then supply a stream of states to anyone who subscribes.
 
-export const initState = <State>(initialState: State) => {
+export const initState = <State>(initialState: State): InitState<State> => {
   const subscribers = new Set<(state: State) => void>();
   let state: State = initialState;
-  const pushState = () => {
+  const pushState = (): undefined => {
     subscribers.forEach((sub) => {
       sub(state);
     });
@@ -32,4 +32,12 @@ export const initState = <State>(initialState: State) => {
     subscribe,
     unsubscribe,
   };
+};
+
+type InitState<State> = {
+  createHandler: <D extends unknown[]>(
+    reducer: (s: State, ...args: D) => State
+  ) => (...data: D) => void;
+  subscribe: (sub: (state: State) => void) => void;
+  unsubscribe: (sub: (state: State) => void) => void;
 };
