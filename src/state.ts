@@ -2,8 +2,22 @@ import { initState } from "./state-management";
 import { type BrandString } from "./type-util";
 import { type RecordOf, List, Record } from "immutable";
 
-const makeDisconnectedState: Record.Factory<DisconnectedStateProps> = Record({
+
+
+export const makeDisconnectedState: Record.Factory<DisconnectedStateProps> = Record({
   websocketStatus: "disconnected",
+  pendingIntents: List(),
+});
+
+export const makeconnectedState: Record.Factory<ConnectedStateProps> = Record({
+  websocketStatus: "connected",
+  pendingIntents: List(),
+  sentIntents: List(),
+  responseData: ""
+});
+
+export const makeConnectingState: Record.Factory<ConnectingStateProps> = Record({
+  websocketStatus: "connecting",
   pendingIntents: List(),
 });
 
@@ -18,13 +32,14 @@ type BaseStateProps = {
   pendingIntents: List<UserIntent>;
 };
 
-export type ConnectedState = RecordOf<
+export type ConnectedStateProps = 
   BaseStateProps & {
     websocketStatus: "connected";
     sentIntents: List<UserIntent>;
     responseData: string;
   }
->;
+export type ConnectedState= RecordOf<ConnectedStateProps>;
+
 
 type DisconnectedStateProps = BaseStateProps & {
   websocketStatus: "disconnected";
@@ -32,11 +47,11 @@ type DisconnectedStateProps = BaseStateProps & {
 };
 export type DisconnectedState = RecordOf<DisconnectedStateProps>;
 
-export type ConnectingState = RecordOf<
+export type ConnectingStateProps = 
   BaseStateProps & {
     websocketStatus: "connecting";
   }
->;
+ export type ConnectingState = RecordOf<ConnectingStateProps>
 
 export type Song = Readonly<{
   file: SongId;
