@@ -3,7 +3,7 @@ import { type BrandString } from "./type-util";
 import { type RecordOf, List, Record } from "immutable";
 
 const makeDisconnectedState: Record.Factory<DisconnectedStateProps> = Record({
-  websocket: "disconnected",
+  websocketStatus: "disconnected",
   pendingIntents: List(),
 });
 
@@ -13,24 +13,30 @@ export const { createHandler, subscribe, unsubscribe } = initState<State>(
 
 export type State = ConnectedState | DisconnectedState | ConnectingState;
 
-export type ConnectedState = RecordOf<{
-  websocket: "connected";
-  player: PlayerStatus;
-  sentIntents: List<UserIntent>;
+type BaseStateProps = {
+  player?: PlayerStatus;
   pendingIntents: List<UserIntent>;
-  responseData: string;
-}>;
+};
 
-type DisconnectedStateProps = {
-  websocket: "disconnected";
-  pendingIntents: List<UserIntent>;
+export type ConnectedState = RecordOf<
+  BaseStateProps & {
+    websocketStatus: "connected";
+    sentIntents: List<UserIntent>;
+    responseData: string;
+  }
+>;
+
+type DisconnectedStateProps = BaseStateProps & {
+  websocketStatus: "disconnected";
+  failure?: RecordOf<{ time: Date; count: number }>;
 };
 export type DisconnectedState = RecordOf<DisconnectedStateProps>;
 
-export type ConnectingState = RecordOf<{
-  websocket: "connecting";
-  pendingIntents: List<UserIntent>;
-}>;
+export type ConnectingState = RecordOf<
+  BaseStateProps & {
+    websocketStatus: "connecting";
+  }
+>;
 
 export type Song = Readonly<{
   file: SongId;
@@ -65,7 +71,7 @@ export const makeIntentHandler = <T extends unknown[]>(
   createHandler((s, ...args) => {
     const intent = makeIntent(...args);
     // We need the switch to make typescript happy
-    switch (s.websocket) {
+    switch (s.websocketStatus) {
       case "connected":
         return s.update("pendingIntents", (intents) => intents.push(intent));
       case "disconnected":
