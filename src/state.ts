@@ -1,28 +1,41 @@
 import { initState } from "./state-management";
-import { type BrandString } from "./type-util";
-import { type RecordOf, List, Record } from "immutable";
+import { type BrandString, BetterRecord } from "./type-util";
+import { type RecordOf, List } from "immutable";
 
+export const makePlayerStatus = BetterRecord<PlayerStatusProps, "currentTrack">(
+  {
+    state: "pause",
+    volume: 0,
+    trackPosition: 0,
+    currentTrack: undefined,
+  }
+);
 
-
-export const makeDisconnectedState: Record.Factory<DisconnectedStateProps> = Record({
+export const makeDisconnectedState = BetterRecord<DisconnectedStateProps>({
   websocketStatus: "disconnected",
   pendingIntents: List(),
+  player: undefined,
+  failureAt: undefined,
 });
 
-export const makeconnectedState: Record.Factory<ConnectedStateProps> = Record({
+export const makeConnectedState = BetterRecord<ConnectedStateProps, "ws">({
   websocketStatus: "connected",
   pendingIntents: List(),
   sentIntents: List(),
-  responseData: ""
+  responseData: "",
+  player: undefined,
+  ws: undefined,
 });
 
-export const makeConnectingState: Record.Factory<ConnectingStateProps> = Record({
+export const makeConnectingState = BetterRecord<ConnectingStateProps, "ws">({
   websocketStatus: "connecting",
   pendingIntents: List(),
+  player: undefined,
+  ws: undefined,
 });
 
 export const { createHandler, subscribe, unsubscribe } = initState<State>(
-  makeDisconnectedState()
+  makeDisconnectedState({})
 );
 
 export type State = ConnectedState | DisconnectedState | ConnectingState;
@@ -32,26 +45,25 @@ type BaseStateProps = {
   pendingIntents: List<UserIntent>;
 };
 
-export type ConnectedStateProps = 
-  BaseStateProps & {
-    websocketStatus: "connected";
-    sentIntents: List<UserIntent>;
-    responseData: string;
-  }
-export type ConnectedState= RecordOf<ConnectedStateProps>;
-
+export type ConnectedStateProps = BaseStateProps & {
+  websocketStatus: "connected";
+  sentIntents: List<UserIntent>;
+  responseData: string;
+  ws: WebSocket;
+};
+export type ConnectedState = RecordOf<ConnectedStateProps>;
 
 type DisconnectedStateProps = BaseStateProps & {
   websocketStatus: "disconnected";
-  failure?: RecordOf<{ time: Date; count: number }>;
+  failureAt?: Date;
 };
 export type DisconnectedState = RecordOf<DisconnectedStateProps>;
 
-export type ConnectingStateProps = 
-  BaseStateProps & {
-    websocketStatus: "connecting";
-  }
- export type ConnectingState = RecordOf<ConnectingStateProps>
+export type ConnectingStateProps = BaseStateProps & {
+  websocketStatus: "connecting";
+  ws: WebSocket;
+};
+export type ConnectingState = RecordOf<ConnectingStateProps>;
 
 export type Song = Readonly<{
   file: SongId;
@@ -62,12 +74,13 @@ export type Song = Readonly<{
   duration?: number;
 }>;
 
-export type PlayerStatus = RecordOf<{
+export type PlayerStatusProps = {
   state: "pause" | "stop" | "play";
   volume: number;
   trackPosition: number;
   currentTrack: SongId;
-}>;
+};
+export type PlayerStatus = RecordOf<PlayerStatusProps>;
 
 export type UserIntent = Readonly<
   | { type: "pause" }
@@ -95,3 +108,6 @@ export const makeIntentHandler = <T extends unknown[]>(
         return s.update("pendingIntents", (intents) => intents.push(intent));
     }
   });
+
+const tick = createHandler((state) => state);
+setInterval(tick, 1000);

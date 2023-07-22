@@ -8,7 +8,7 @@ import { type Consumer } from "./types";
 export const initState = <State>(initialState: State): InitState<State> => {
   const subscribers = new Set<Consumer<State>>();
   let state: State = initialState;
-  const pushState = (): undefined => {
+  const pushState = (): void => {
     subscribers.forEach((sub) => {
       sub(state);
     });
