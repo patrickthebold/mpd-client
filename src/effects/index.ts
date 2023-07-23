@@ -1,4 +1,5 @@
 import { type State, createHandler, subscribe } from "../state";
+import { ensureConnection, removeWsListeners } from "./ensureConnection";
 import { type Effect } from "./types";
 
 /**
@@ -16,7 +17,7 @@ const setState = (state: State): void => {
   });
 };
 
-const effects: Effect[] = [];
+const effects: Effect[] = [ensureConnection, removeWsListeners];
 
 subscribe((state) => {
   let newState = state;

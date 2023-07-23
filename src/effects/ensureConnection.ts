@@ -61,7 +61,7 @@ export const ensureConnection: Effect = (state) => {
   return state;
 };
 
-export const removeEventListener: Effect = (state) => {
+export const removeWsListeners: Effect = (state) => {
   if (state.websocketStatus === "disconnected" && state.ws) {
     state.ws.removeEventListener("close", setDisconnected);
     state.ws.removeEventListener("open", setConnected);
