@@ -2,14 +2,15 @@ import { initState } from "./state-management";
 import { type BrandString, BetterRecord } from "./type-util";
 import { type RecordOf, List } from "immutable";
 
-export const makePlayerStatus = BetterRecord<PlayerStatusProps, "currentTrack">(
-  {
-    state: "pause",
-    volume: 0,
-    trackPosition: 0,
-    currentTrack: undefined,
-  }
-);
+export const makePlayerStatus = BetterRecord<
+  PlayerStatusProps,
+  keyof PlayerStatusProps
+>({
+  state: undefined,
+  volume: undefined,
+  trackPosition: undefined,
+  currentTrack: undefined,
+});
 
 export const makeDisconnectedState = BetterRecord<DisconnectedStateProps>({
   websocketStatus: "disconnected",
@@ -35,7 +36,7 @@ export const makeConnectingState = BetterRecord<ConnectingStateProps, "ws">({
 });
 
 export const { createHandler, subscribe, unsubscribe } = initState<State>(
-  makeDisconnectedState({})
+  makeDisconnectedState()
 );
 
 export type State = ConnectedState | DisconnectedState | ConnectingState;
