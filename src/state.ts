@@ -17,6 +17,7 @@ export const makeDisconnectedState = BetterRecord<DisconnectedStateProps>({
   pendingIntents: List(),
   player: undefined,
   failureAt: undefined,
+  ws: undefined,
 });
 
 export const makeConnectedState = BetterRecord<ConnectedStateProps, "ws">({
@@ -57,6 +58,7 @@ export type ConnectedState = RecordOf<ConnectedStateProps>;
 type DisconnectedStateProps = BaseStateProps & {
   websocketStatus: "disconnected";
   failureAt?: Date;
+  ws?: WebSocket; // optionally old websocket because we need to clean up event listeners.
 };
 export type DisconnectedState = RecordOf<DisconnectedStateProps>;
 

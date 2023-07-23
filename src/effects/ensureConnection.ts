@@ -25,12 +25,10 @@ const setDisconnected = createHandler((state) => {
     console.error("disconnecting when already disconnected");
     return state;
   } else {
-    state.ws.removeEventListener("close", setDisconnected);
-    state.ws.removeEventListener("open", setConnected);
-    state.ws.removeEventListener("error", setDisconnected);
     return getDisconnectedState(state);
   }
 });
+
 const setConnected = createHandler((state) => {
   if (state.websocketStatus === "connecting") {
     return makeConnectedState({
@@ -46,6 +44,7 @@ const setConnected = createHandler((state) => {
 export const ensureConnection: Effect = (state) => {
   if (
     state.websocketStatus === "disconnected" &&
+    state.ws === undefined &&
     (state.failureAt === undefined ||
       state.failureAt.getTime() < Date.now() - RECONNECT_MS)
   ) {
@@ -58,6 +57,16 @@ export const ensureConnection: Effect = (state) => {
       websocketStatus: "connecting",
       ws,
     });
+  }
+  return state;
+};
+
+export const removeEventListener: Effect = (state) => {
+  if (state.websocketStatus === "disconnected" && state.ws) {
+    state.ws.removeEventListener("close", setDisconnected);
+    state.ws.removeEventListener("open", setConnected);
+    state.ws.removeEventListener("error", setDisconnected);
+    state.remove("ws");
   }
   return state;
 };
