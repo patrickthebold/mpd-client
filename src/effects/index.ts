@@ -8,14 +8,7 @@ import { type Effect } from "./types";
  * do something conditionally, and usually will return the same state because they did no side effects.
  */
 
-// The queue microtask is probably unnecessary in practice. When we set the state will will be fed the newState
-// back into the function passed to `subscribe`. I want to unwind the stack before I call that function again.
-const setStateSync = createHandler((_oldState, newState: State) => newState);
-const setState = (state: State): void => {
-  queueMicrotask(() => {
-    setStateSync(state);
-  });
-};
+const setState = createHandler((_oldState, newState: State) => newState);
 
 const effects: Effect[] = [ensureConnection, removeWsListeners];
 

@@ -1,6 +1,6 @@
 import { type SongId, makeDisconnectedState, makePlayerStatus } from "./state";
 
-describe("makeCDisconnectedState", () => {
+describe("makeDisconnectedState", () => {
   it("should allow player Status to be set", () => {
     let state = makeDisconnectedState();
     const playerStatus = makePlayerStatus({

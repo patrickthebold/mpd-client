@@ -1,1 +1,1 @@
-export type Consumer<T> = (t: T) => void
+export type Consumer<T> = (t: T) => void;
