@@ -1,6 +1,5 @@
 import { type State, createHandler, subscribe } from "../state";
 import { skipDuplicates, perTick } from "../transformers";
-import { pull, compose } from "../util";
 import { ensureConnection, removeWsListeners } from "./ensureConnection";
 import { type Effect } from "./types";
 
@@ -13,9 +12,7 @@ const setState = createHandler((_oldState, newState: State) => newState);
 
 const effects: Effect[] = [ensureConnection, removeWsListeners];
 
-const subscribeEffects = pull(
-  compose(skipDuplicates<State>(), perTick<State>())
-)(subscribe);
+const subscribeEffects = subscribe.with(skipDuplicates()).with(perTick());
 
 subscribeEffects((state) => {
   setState(effects.reduce((newState, effect) => effect(newState), state));

@@ -1,6 +1,7 @@
 import { initState } from "./state-management";
 import { type BrandString, BetterRecord } from "./type-util";
 import { type RecordOf, List } from "immutable";
+import { makeConfigurable } from "./util";
 
 export const makePlayerStatus = BetterRecord<
   PlayerStatusProps,
@@ -36,9 +37,12 @@ export const makeConnectingState = BetterRecord<ConnectingStateProps, "ws">({
   ws: undefined,
 });
 
-export const { createHandler, subscribe, unsubscribe } = initState<State>(
+const { createHandler, subscribe: baseSubscribe } = initState<State>(
   makeDisconnectedState()
 );
+
+export { createHandler };
+export const subscribe = makeConfigurable(baseSubscribe);
 
 export type State = ConnectedState | DisconnectedState | ConnectingState;
 
