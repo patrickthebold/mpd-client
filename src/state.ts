@@ -25,7 +25,7 @@ export const makeConnectedState = BetterRecord<ConnectedStateProps, "ws">({
   websocketStatus: "connected",
   pendingIntents: List(),
   sentIntents: List(),
-  responseData: "",
+  responseData: List(),
   player: undefined,
   ws: undefined,
 });
@@ -54,7 +54,7 @@ type BaseStateProps = {
 export type ConnectedStateProps = BaseStateProps & {
   websocketStatus: "connected";
   sentIntents: List<UserIntent>;
-  responseData: string;
+  responseData: List<string>;
   ws: WebSocket;
 };
 export type ConnectedState = RecordOf<ConnectedStateProps>;
