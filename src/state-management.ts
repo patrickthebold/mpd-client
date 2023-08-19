@@ -6,7 +6,7 @@
 import { type Consumer } from "./types";
 
 export const initState = <State>(initialState: State): InitState<State> => {
-  const subscribers = new Set<Consumer<State>>();
+  const subscribers = new Set<Consumer<[State]>>();
   let state: State = initialState;
   const pushState = (): void => {
     subscribers.forEach((sub) => {
@@ -21,12 +21,12 @@ export const initState = <State>(initialState: State): InitState<State> => {
       pushState();
     };
 
-  const subscribe = (sub: Consumer<State>): void => {
+  const subscribe = (sub: Consumer<[State]>): void => {
     sub(state);
     subscribers.add(sub);
   };
 
-  const unsubscribe = (sub: Consumer<State>): void => {
+  const unsubscribe = (sub: Consumer<[State]>): void => {
     subscribers.delete(sub);
   };
   return {
@@ -40,6 +40,6 @@ type InitState<State> = {
   createHandler: <D extends unknown[]>(
     reducer: (s: State, ...args: D) => State
   ) => (...data: D) => void;
-  subscribe: (sub: Consumer<State>) => void;
-  unsubscribe: (sub: Consumer<State>) => void;
+  subscribe: (sub: Consumer<[State]>) => void;
+  unsubscribe: (sub: Consumer<[State]>) => void;
 };

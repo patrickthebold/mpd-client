@@ -1,6 +1,7 @@
-export type Consumer<T> = (t: T) => void;
-export type ConsumerTransformer<T, S = T> = (
-  mapper: Consumer<T>
-) => Consumer<S>;
+export type Consumer<T extends unknown[]> = (...t: T) => void;
+export type ConsumerTransformer<
+  T extends unknown[],
+  S extends unknown[] = T
+> = (consumer: Consumer<T>) => Consumer<S>;
 export type Callback = () => void;
-export type Scheduler = Consumer<Callback>;
+export type Scheduler = Consumer<[Callback]>;
