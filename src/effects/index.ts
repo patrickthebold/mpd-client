@@ -1,3 +1,4 @@
+import { time } from "../coeffects/time";
 import { type State, createHandler, subscribe } from "../state";
 import { skipDuplicates, perTick } from "../transformers";
 import { ensureConnection, removeWsListeners } from "./ensureConnection";
@@ -12,8 +13,11 @@ const setState = createHandler((_oldState, newState: State) => newState);
 
 const effects: Effect[] = [ensureConnection, removeWsListeners];
 
-const subscribeEffects = subscribe.with(skipDuplicates()).with(perTick());
+const subscribeEffects = subscribe
+  .with(time(1000))
+  .with(skipDuplicates())
+  .with(perTick());
 
-subscribeEffects((state) => {
-  setState(effects.reduce((newState, effect) => effect(newState), state));
+subscribeEffects((state, now) => {
+  setState(effects.reduce((newState, effect) => effect(newState, now), state));
 });

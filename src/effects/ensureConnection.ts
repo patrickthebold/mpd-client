@@ -56,12 +56,12 @@ const handleMessage = createHandler((state, e: MessageEvent) => {
   return state;
 });
 
-export const ensureConnection: Effect = (state) => {
+export const ensureConnection: Effect = (state, now) => {
   if (
     state.websocketStatus === "disconnected" &&
     state.ws === undefined &&
     (state.failureAt === undefined ||
-      state.failureAt.getTime() < Date.now() - RECONNECT_MS)
+      state.failureAt.getTime() < now.getTime() - RECONNECT_MS)
   ) {
     const ws = new WebSocket(WS_URL);
     ws.addEventListener("close", setDisconnected);
