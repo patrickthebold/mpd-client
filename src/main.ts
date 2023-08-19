@@ -1,6 +1,7 @@
 import "./style.css";
 import typescriptLogo from "./typescript.svg";
-import viteLogo from "../../../../../vite.svg";
+// eslint-disable-next-line import/no-absolute-path
+import viteLogo from "/vite.svg";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (app)
