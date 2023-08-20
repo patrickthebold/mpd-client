@@ -37,11 +37,10 @@ export const makeConnectingState = BetterRecord<ConnectingStateProps, "ws">({
   ws: undefined,
 });
 
-const { createHandler, subscribe: baseSubscribe } = initState<State>(
-  makeDisconnectedState()
-);
+const { createHandler: baseCreateHandler, subscribe: baseSubscribe } =
+  initState<State>(makeDisconnectedState());
 
-export { createHandler };
+export const createHandler = makeConfigurable(baseCreateHandler);
 export const subscribe = makeConfigurable(baseSubscribe);
 
 export type State = ConnectedState | DisconnectedState | ConnectingState;
