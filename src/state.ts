@@ -115,6 +115,3 @@ export const makeIntentHandler = <T extends unknown[]>(
         return s.update("pendingIntents", (intents) => intents.push(intent));
     }
   });
-
-const tick = createHandler((state) => state);
-setInterval(tick, 1000);
