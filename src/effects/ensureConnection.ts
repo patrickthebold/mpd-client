@@ -1,3 +1,4 @@
+import { currentTime } from "../coeffects";
 import {
   type DisconnectedState,
   makeConnectedState,
@@ -13,23 +14,25 @@ import { type Effect } from "./types";
 const WS_URL = "ws://localhost:8080";
 const RECONNECT_MS = 2000;
 
-const getDisconnectedState = (state: State): DisconnectedState =>
+const createHandlerWithTime = createHandler.with(currentTime());
+
+const getDisconnectedState = (state: State, now: Date): DisconnectedState =>
   makeDisconnectedState({
     ...state.toObject(),
     websocketStatus: "disconnected",
-    failureAt: new Date(),
+    failureAt: now,
   });
 
-const setDisconnected = createHandler((state) => {
+const setDisconnected = createHandlerWithTime((state, now) => {
   if (state.websocketStatus === "disconnected") {
     console.error("disconnecting when already disconnected");
     return state;
   } else {
-    return getDisconnectedState(state);
+    return getDisconnectedState(state, now);
   }
 });
 
-const setConnected = createHandler((state) => {
+const setConnected = createHandlerWithTime((state, now) => {
   if (state.websocketStatus === "connecting") {
     return makeConnectedState({
       ...state.toObject(),
@@ -37,7 +40,7 @@ const setConnected = createHandler((state) => {
     });
   } else {
     console.error('unexpected "open" event! Setting state as disconnected');
-    return getDisconnectedState(state);
+    return getDisconnectedState(state, now);
   }
 });
 
