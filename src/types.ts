@@ -16,3 +16,5 @@ export type ReducerTransformer<
   T extends unknown[],
   D extends unknown[]
 > = (Reducer: Reducer<State, T>) => Reducer<State, D>;
+
+export type Handler<T extends unknown[]> = (...t: T) => void;

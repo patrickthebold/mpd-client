@@ -2,6 +2,7 @@ import { initState } from "./state-management";
 import { type BrandString, BetterRecord } from "./type-util";
 import { type RecordOf, List } from "immutable";
 import { makeConfigurable } from "./util";
+import { type MpdCommand, type UserIntent } from "./intents";
 
 export const makePlayerStatus = BetterRecord<
   PlayerStatusProps,
@@ -24,8 +25,10 @@ export const makeDisconnectedState = BetterRecord<DisconnectedStateProps>({
 export const makeConnectedState = BetterRecord<ConnectedStateProps, "ws">({
   websocketStatus: "connected",
   pendingIntents: List(),
-  sentIntents: List(),
+  sentCommands: List(),
   responseData: List(),
+  q: List(),
+  isCommandList: false,
   player: undefined,
   ws: undefined,
 });
@@ -52,9 +55,11 @@ type BaseStateProps = {
 
 export type ConnectedStateProps = BaseStateProps & {
   websocketStatus: "connected";
-  sentIntents: List<UserIntent>;
+  sentCommands: List<MpdCommand>;
+  isCommandList: boolean;
   responseData: List<string>;
   ws: WebSocket;
+  q: List<Song>;
 };
 export type ConnectedState = RecordOf<ConnectedStateProps>;
 
@@ -84,33 +89,8 @@ export type PlayerStatusProps = {
   state: "pause" | "stop" | "play";
   volume: number;
   trackPosition: number;
-  currentTrack: SongId;
+  currentTrack: number;
 };
 export type PlayerStatus = RecordOf<PlayerStatusProps>;
 
-export type UserIntent = Readonly<
-  | { type: "pause" }
-  | { type: "stop" }
-  | { type: "next_track" }
-  | { type: "previous_track" }
-  | { type: "set_volume"; volume: number }
->;
-
 export type SongId = BrandString<"SongId">;
-
-type Handler<T extends unknown[]> = (...t: T) => void;
-export const makeIntentHandler = <T extends unknown[]>(
-  makeIntent: (...args: T) => UserIntent
-): Handler<T> =>
-  createHandler((s, ...args) => {
-    const intent = makeIntent(...args);
-    // We need the switch to make typescript happy
-    switch (s.websocketStatus) {
-      case "connected":
-        return s.update("pendingIntents", (intents) => intents.push(intent));
-      case "disconnected":
-        return s.update("pendingIntents", (intents) => intents.push(intent));
-      case "connecting":
-        return s.update("pendingIntents", (intents) => intents.push(intent));
-    }
-  });

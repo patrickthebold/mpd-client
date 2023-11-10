@@ -51,9 +51,12 @@ const handleMessage = createHandler((state, e: MessageEvent) => {
   }
   const probablyText = e.data;
   if (typeof probablyText === "string") {
-    return state.update("responseData", (response) =>
-      response.push(...probablyText.split("\n"))
-    );
+    // Little dance so that responseData is split on new lines.
+    return state.update("responseData", (response) => {
+      const [head, ...tail] = probablyText.split("\n");
+      const newLast = response.last("") + head;
+      return response.butLast().push(newLast, ...tail);
+    });
   }
   console.warn("We did not get a string over the websocket");
   return state;
