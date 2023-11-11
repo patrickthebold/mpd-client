@@ -4,6 +4,7 @@ export type UserIntent = Readonly<
   | { type: "next_track" }
   | { type: "previous_track" }
   | { type: "set_volume"; volume: number }
+  | { type: "idle" }
 >;
 
 // We expect these to drift over time. A single user intent might need to
@@ -14,4 +15,5 @@ export type MpdCommandString =
   | "stop"
   | "next"
   | "previous"
+  | "idle"
   | `setvol ${number}`;

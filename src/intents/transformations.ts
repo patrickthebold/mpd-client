@@ -13,5 +13,7 @@ export const command2String = (command: MpdCommand): MpdCommandString => {
       return "previous";
     case "set_volume":
       return `setvol ${command.volume}`;
+    case "idle":
+      return "idle";
   }
 };

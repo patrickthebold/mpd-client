@@ -9,7 +9,11 @@ export const sendCommands: Effect = (state) => {
     state.sentCommands.isEmpty() &&
     !state.pendingIntents.isEmpty()
   ) {
-    const commands = state.pendingIntents.flatMap(intent2Commands);
+    const filteredIntents =
+      state.pendingIntents.size > 1
+        ? state.pendingIntents.filterNot((intent) => intent.type === "idle")
+        : state.pendingIntents;
+    const commands = filteredIntents.flatMap(intent2Commands);
     const commandList = commands.map(command2String).join("\n");
     const isCommandList = commands.size > 1;
     const fullCommand = isCommandList
@@ -105,4 +109,16 @@ const responseHandlers: Record<MpdCommand["type"], Effect> = {
         ((i as number) - 1 + state.q.size) % state.q.size
     )
   ),
+  idle: liftFullResponseHandler((state) => state), // TODO
+};
+
+export const ensureIdle: Effect = (state) => {
+  if (
+    state.pendingIntents.isEmpty() &&
+    state.websocketStatus === "connected" &&
+    state.sentCommands.isEmpty()
+  ) {
+    return state.set("pendingIntents", List.of({ type: "idle" }));
+  }
+  return state;
 };

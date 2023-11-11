@@ -1,10 +1,10 @@
-import { type SongId, makeDisconnectedState, makePlayerStatus } from "./state";
+import { makeDisconnectedState, makePlayerStatus } from "./state";
 
 describe("makeDisconnectedState", () => {
   it("should allow player Status to be set", () => {
     let state = makeDisconnectedState();
     const playerStatus = makePlayerStatus({
-      currentTrack: "" as SongId,
+      currentTrack: 0,
       trackPosition: 0,
       volume: 0,
       state: "pause",
