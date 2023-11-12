@@ -122,3 +122,18 @@ export const ensureIdle: Effect = (state) => {
   }
   return state;
 };
+
+export const noIdle: Effect = (state) => {
+  if (
+    !state.pendingIntents.isEmpty() &&
+    state.websocketStatus === "connected" &&
+    state.sentCommands.size === 1
+  ) {
+    const cmd = state.sentCommands.get(0);
+    if (cmd?.type === "idle" && !cmd.cancled) {
+      state.ws.send("noidle");
+      return state.setIn(["sentCommands", 0, "canceled"], true);
+    }
+  }
+  return state;
+};

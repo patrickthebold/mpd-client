@@ -4,7 +4,7 @@ export type UserIntent = Readonly<
   | { type: "next_track" }
   | { type: "previous_track" }
   | { type: "set_volume"; volume: number }
-  | { type: "idle" }
+  | { type: "idle"; cancled?: boolean }
 >;
 
 // We expect these to drift over time. A single user intent might need to
