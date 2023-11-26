@@ -130,7 +130,7 @@ export const noIdle: Effect = (state) => {
     state.sentCommands.size === 1
   ) {
     const cmd = state.sentCommands.get(0);
-    if (cmd?.type === "idle" && !cmd.cancled) {
+    if (cmd?.type === "idle" && !cmd.canceled) {
       state.ws.send("noidle");
       return state.setIn(["sentCommands", 0, "canceled"], true);
     }
