@@ -15,5 +15,9 @@ export const command2String = (command: MpdCommand): MpdCommandString => {
       return `setvol ${command.volume}`;
     case "idle":
       return "idle";
+    case "get_q":
+      return "playlistinfo";
+    case "status":
+      return "status";
   }
 };

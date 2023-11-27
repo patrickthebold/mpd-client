@@ -2,6 +2,7 @@ import { List } from "immutable";
 import { type MpdCommand, command2String, intent2Commands } from "../intents";
 import type { Effect } from "./types";
 import type { ConnectedState, PlayerStatusProps, State } from "../state";
+import { getQ, idle } from "../intents/const";
 
 export const sendCommands: Effect = (state) => {
   if (
@@ -91,7 +92,7 @@ const responseHandlers: Record<MpdCommand["type"], Effect> = {
     state.updateIn(
       ["player", "currentTrack"],
       (i): PlayerStatusProps["currentTrack"] =>
-        ((i as number) + 1) % state.q.size
+        ((i as number) + 1) % (state.q?.size ?? 1)
     )
   ),
   set_volume: liftFullResponseHandler((state, _, command) =>
@@ -106,10 +107,12 @@ const responseHandlers: Record<MpdCommand["type"], Effect> = {
     state.updateIn(
       ["player", "currentTrack"],
       (i): PlayerStatusProps["currentTrack"] =>
-        ((i as number) - 1 + state.q.size) % state.q.size
+        ((i as number) - 1 + (state.q?.size ?? 0)) % (state.q?.size ?? 1)
     )
   ),
   idle: liftFullResponseHandler((state) => state), // TODO
+  status: liftFullResponseHandler((state) => state), // TODO
+  get_q: liftFullResponseHandler((state) => state), // TODO
 };
 
 export const ensureIdle: Effect = (state) => {
@@ -118,7 +121,7 @@ export const ensureIdle: Effect = (state) => {
     state.websocketStatus === "connected" &&
     state.sentCommands.isEmpty()
   ) {
-    return state.set("pendingIntents", List.of({ type: "idle" }));
+    return state.set("pendingIntents", List.of(idle(false)));
   }
   return state;
 };
@@ -132,7 +135,21 @@ export const noIdle: Effect = (state) => {
     const cmd = state.sentCommands.get(0);
     if (cmd?.type === "idle" && !cmd.canceled) {
       state.ws.send("noidle");
-      return state.setIn(["sentCommands", 0, "canceled"], true);
+      return state.setIn(["sentCommands", 0], idle(true));
+    }
+  }
+  return state;
+};
+
+export const ensureQ: Effect = (state) => {
+  if (state.q === undefined && !state.pendingIntents.contains(getQ)) {
+    switch (state.websocketStatus) {
+      case "connected":
+        return state.update("pendingIntents", (intents) => intents.push(getQ));
+      case "connecting":
+        return state.update("pendingIntents", (intents) => intents.push(getQ));
+      case "disconnected":
+        return state.update("pendingIntents", (intents) => intents.push(getQ));
     }
   }
   return state;

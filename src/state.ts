@@ -20,6 +20,7 @@ export const makeDisconnectedState = BetterRecord<DisconnectedStateProps>({
   player: undefined,
   failureAt: undefined,
   ws: undefined,
+  q: undefined,
 });
 
 export const makeConnectedState = BetterRecord<ConnectedStateProps, "ws">({
@@ -27,10 +28,10 @@ export const makeConnectedState = BetterRecord<ConnectedStateProps, "ws">({
   pendingIntents: List(),
   sentCommands: List(),
   responseData: List(),
-  q: List(),
   isCommandList: false,
   player: undefined,
   ws: undefined,
+  q: undefined,
 });
 
 export const makeConnectingState = BetterRecord<ConnectingStateProps, "ws">({
@@ -38,6 +39,7 @@ export const makeConnectingState = BetterRecord<ConnectingStateProps, "ws">({
   pendingIntents: List(),
   player: undefined,
   ws: undefined,
+  q: undefined,
 });
 
 const { createHandler: baseCreateHandler, subscribe: baseSubscribe } =
@@ -51,6 +53,7 @@ export type State = ConnectedState | DisconnectedState | ConnectingState;
 type BaseStateProps = {
   player?: PlayerStatus;
   pendingIntents: List<UserIntent>;
+  q?: List<Song>;
 };
 
 export type ConnectedStateProps = BaseStateProps & {
@@ -59,7 +62,6 @@ export type ConnectedStateProps = BaseStateProps & {
   isCommandList: boolean;
   responseData: List<string>;
   ws: WebSocket;
-  q: List<Song>;
 };
 export type ConnectedState = RecordOf<ConnectedStateProps>;
 
