@@ -1,8 +1,13 @@
 import { List } from "immutable";
-import { type MpdCommand, command2String, intent2Commands } from "../intents";
+import {
+  type MpdCommand,
+  command2String,
+  intent2Commands,
+  type UserIntent,
+} from "../intents";
 import type { Effect } from "./types";
 import type { ConnectedState, PlayerStatusProps, State } from "../state";
-import { getQ, idle } from "../intents/const";
+import { getQ, idle, status } from "../intents/const";
 
 export const sendCommands: Effect = (state) => {
   if (
@@ -143,14 +148,25 @@ export const noIdle: Effect = (state) => {
 
 export const ensureQ: Effect = (state) => {
   if (state.q === undefined && !state.pendingIntents.contains(getQ)) {
-    switch (state.websocketStatus) {
-      case "connected":
-        return state.update("pendingIntents", (intents) => intents.push(getQ));
-      case "connecting":
-        return state.update("pendingIntents", (intents) => intents.push(getQ));
-      case "disconnected":
-        return state.update("pendingIntents", (intents) => intents.push(getQ));
-    }
+    return addIntent(state, getQ);
   }
   return state;
+};
+
+export const ensureStatus: Effect = (state) => {
+  if (state.player === undefined && !state.pendingIntents.contains(status)) {
+    return addIntent(state, status);
+  }
+  return state;
+};
+
+const addIntent = (state: State, intent: UserIntent): State => {
+  switch (state.websocketStatus) {
+    case "connected":
+      return state.update("pendingIntents", (intents) => intents.push(intent));
+    case "connecting":
+      return state.update("pendingIntents", (intents) => intents.push(intent));
+    case "disconnected":
+      return state.update("pendingIntents", (intents) => intents.push(intent));
+  }
 };
